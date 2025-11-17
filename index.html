@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusOS - Student Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00f5ff;
+            --primary-dark: #00a8cc;
+            --secondary: #9d4edd;
+            --secondary-dark: #7b2cbf;
+            --accent: #ff006e;
+            --success: #38b000;
+            --warning: #ff9e00;
+            --danger: #ef233c;
+            --info: #4361ee;
+            --dark: #0c0f1d;
+            --darker: #070a15;
+            --light: #e2eafc;
+            --gray: #8d99ae;
+            --bg-gradient: linear-gradient(135deg, #0c0f1d 0%, #1a1f3a 100%);
+            --panel-bg: rgba(20, 25, 50, 0.7);
+            --panel-border: rgba(0, 245, 255, 0.3);
+            --glow: 0 0 10px rgba(0, 245, 255, 0.7);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        .light-mode {
+            --primary: #0066cc;
+            --primary-dark: #004499;
+            --secondary: #7a00cc;
+            --secondary-dark: #5a0099;
+            --accent: #cc0055;
+            --success: #2a9400;
+            --warning: #cc7a00;
+            --danger: #cc001f;
+            --info: #2a52cc;
+            --dark: #f0f2f8;
+            --darker: #e0e5f0;
+            --light: #0c0f1d;
+            --gray: #5a6578;
+            --bg-gradient: linear-gradient(135deg, #f0f2f8 0%, #dde2f0 100%);
+            --panel-bg: rgba(255, 255, 255, 0.8);
+            --panel-border: rgba(0, 102, 204, 0.3);
+            --glow: 0 0 10px rgba(0, 102, 204, 0.3);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(157, 78, 221, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 0, 110, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .light-mode::before {
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(157, 78, 221, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 102, 204, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 0, 110, 0.03) 0%, transparent 50%);
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--panel-border);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            text-shadow: var(--glow);
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .system-time {
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: var(--primary);
+            text-shadow: 0 0 5px rgba(0, 245, 255, 0.5);
+        }
+
+        .light-mode .system-time {
+            text-shadow: 0 0 5px rgba(0, 102, 204, 0.3);
+        }
+
+        /* Desktop */
+        .desktop {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-auto-rows: 120px;
+            gap: 20px;
+            padding: 20px;
+            min-height: 70vh;
+        }
+
+        .desktop-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            background: rgba(30, 35, 70, 0.5);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            transition: var(--transition);
+            cursor: pointer;
+            padding: 10px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .light-mode .desktop-item {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 102, 204, 0.2);
+        }
+
+        .desktop-item:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 35, 70, 0.8);
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+        }
+
+        .light-mode .desktop-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+        }
+
+        .desktop-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .desktop-name {
+            font-size: 0.9rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Taskbar */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--panel-border);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .taskbar-apps {
+            display: flex;
+            gap: 10px;
+        }
+
+        .taskbar-app {
+            padding: 8px 15px;
+            border-radius: var(--radius);
+            background: rgba(30, 35, 70, 0.5);
+            border: 1px solid var(--panel-border);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .taskbar-app:hover {
+            background: rgba(0, 245, 255, 0.2);
+        }
+
+        .system-tray {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(0, 245, 255, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 245, 255, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(0, 245, 255, 0.5); }
+        }
+
+        .glow {
+            animation: glow 3s infinite;
+        }
+
+        .light-mode .glow {
+            animation: glow 3s infinite;
+            box-shadow: 0 0 10px rgba(0, 102, 204, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .desktop {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                grid-auto-rows: 100px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .taskbar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="matrix-bg" id="matrix-bg"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-cube"></i></div>
+                <div class="logo-text">NexusOS Student Portal</div>
+            </div>
+            <div class="system-time" id="system-time">22:14:36</div>
+        </header>
+
+        <div class="desktop">
+            <a href="file-explorer.html" class="desktop-item">
+                <div class="desktop-icon"><i class="fas fa-folder"></i></div>
+                <div class="desktop-name">File Explorer</div>
+            </a>
+            <a href="terminal.html" class="desktop-item">
+                <div class="desktop-icon"><i class="fas fa-terminal"></i></div>
+                <div class="desktop-name">Terminal</div>
+            </a>
+            <a href="browser.html" class="desktop-item">
+                <div class="desktop-icon"><i class="fas fa-globe"></i></div>
+                <div class="desktop-name">Web Browser</div>
+            </a>
+            <a href="text-editor.html" class="desktop-item">
+                <div class="desktop-icon"><i class="fas fa-edit"></i></div>
+                <div class="desktop-name">Text Editor</div>
+            </a>
+            <a href="media-player.html" class="desktop-item">
+                <div class="desktop-icon"><i class="fas fa-play-circle"></i></div>
+                <div class="desktop-name">Media Player</div>
+            </a>
+            <a href="calculator.html" class="desktop-item">
+                <div class="desktop-icon"><i class="fas fa-calculator"></i></div>
+                <div class="desktop-name">Calculator</div>
+            </a>
+            <a href="settings.html" class="desktop-item">
+                <div class="desktop-icon"><i class="fas fa-cogs"></i></div>
+                <div class="desktop-name">Settings</div>
+            </a>
+            <a href="help.html" class="desktop-item">
+                <div class="desktop-icon"><i class="fas fa-question-circle"></i></div>
+                <div class="desktop-name">Help & Tutorials</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <div class="taskbar-apps">
+            <div class="taskbar-app">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </div>
+            <div class="taskbar-app">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+            </div>
+        </div>
+        <div class="system-tray">
+            <div class="system-info">
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-volume-up"></i>
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+            <div id="taskbar-time">22:14</div>
+        </div>
+    </div>
+
+    <script>
+        // Matrix background effect
+        function createMatrixBackground() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const container = document.getElementById('matrix-bg');
+            
+            container.appendChild(canvas);
+            
+            function resizeCanvas() {
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            const chars = "01010101010101010101010101010101";
+            const charArray = chars.split("");
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+            
+            for (let x = 0; x < columns; x++) {
+                drops[x] = 1;
+            }
+            
+            function draw() {
+                ctx.fillStyle = "rgba(10, 15, 30, 0.04)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = "#00f5ff";
+                ctx.font = fontSize + "px monospace";
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const text = charArray[Math.floor(Math.random() * charArray.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    drops[i]++;
+                }
+            }
+            
+            setInterval(draw, 33);
+        }
+
+        // System time update
+        function updateSystemTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {hour12: false});
+            const shortTimeString = now.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
+            
+            document.getElementById('system-time').textContent = timeString;
+            document.getElementById('taskbar-time').textContent = shortTimeString;
+        }
+
+        // Initialize the portal
+        function initPortal() {
+            createMatrixBackground();
+            setInterval(updateSystemTime, 1000);
+            updateSystemTime();
+            
+            // Load theme preference
+            const savedTheme = localStorage.getItem('nexusos-theme');
+            if (savedTheme === 'light') {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+            }
+        }
+
+        // Start the portal when the page loads
+        window.addEventListener('load', initPortal);
+    </script>
+</body>
+</html>

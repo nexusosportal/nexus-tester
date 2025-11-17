@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal - NexusOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Terminal-specific styles */
+        :root { /* Same color variables as homepage */ }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: linear-gradient(135deg, #0c0f1d 0%, #1a1f3a 100%); color: #e2eafc; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .back-btn { color: #00f5ff; text-decoration: none; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
+        .app-title { font-size: 1.8rem; color: #00f5ff; display: flex; align-items: center; gap: 10px; }
+        .terminal { background: rgba(10, 15, 30, 0.9); border-radius: 12px; padding: 20px; font-family: 'Courier New', monospace; height: 70vh; overflow-y: auto; }
+        .terminal-line { margin-bottom: 5px; }
+        .terminal-prompt { color: #38b000; }
+        .terminal-command { color: #e2eafc; }
+        .terminal-output { color: #8d99ae; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i>Back to Desktop</a>
+            <h1 class="app-title"><i class="fas fa-terminal"></i>Terminal</h1>
+        </div>
+        <div class="terminal" id="terminal">
+            <div class="terminal-line">
+                <span class="terminal-prompt">nexusos@student-portal:~$ </span>
+                <span class="terminal-command">welcome --activate</span>
+            </div>
+            <div class="terminal-line terminal-output">NexusOS Student Portal Terminal v2.1.4</div>
+            <div class="terminal-line terminal-output">Type 'help' for available commands</div>
+            <div class="terminal-line">
+                <span class="terminal-prompt">nexusos@student-portal:~$ </span>
+                <span class="terminal-command" id="current-command"></span>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Terminal functionality (same as in the combined version)
+        document.addEventListener('DOMContentLoaded', function() {
+            const commands = ["help", "date", "echo 'Hello, World!'", "ls", "clear"];
+            let commandIndex = 0;
+            const terminal = document.getElementById('terminal');
+            let currentCommand = document.getElementById('current-command');
+            
+            function typeCommand() {
+                if (commandIndex < commands.length) {
+                    const command = commands[commandIndex];
+                    let i = 0;
+                    currentCommand.textContent = '';
+                    
+                    const typing = setInterval(() => {
+                        if (i < command.length) {
+                            currentCommand.textContent += command.charAt(i);
+                            i++;
+                            terminal.scrollTop = terminal.scrollHeight;
+                        } else {
+                            clearInterval(typing);
+                            setTimeout(() => {
+                                const newLine = document.createElement('div');
+                                newLine.className = 'terminal-line terminal-output';
+                                let output = '';
+                                switch(command) {
+                                    case "help": output = "Available commands: help, date, echo, ls, clear"; break;
+                                    case "date": output = new Date().toString(); break;
+                                    case "echo 'Hello, World!'": output = "Hello, World!"; break;
+                                    case "ls": output = "notes.txt  project.js  report.pdf"; break;
+                                    case "clear": 
+                                        terminal.innerHTML = '';
+                                        const newPrompt = document.createElement('div');
+                                        newPrompt.className = 'terminal-line';
+                                        newPrompt.innerHTML = `<span class="terminal-prompt">nexusos@student-portal:~$ </span><span class="terminal-command" id="current-command"></span>`;
+                                        terminal.appendChild(newPrompt);
+                                        currentCommand = document.getElementById('current-command');
+                                        break;
+                                }
+                                if (command !== "clear") {
+                                    newLine.textContent = output;
+                                    terminal.appendChild(newLine);
+                                    const newPrompt = document.createElement('div');
+                                    newPrompt.className = 'terminal-line';
+                                    newPrompt.innerHTML = `<span class="terminal-prompt">nexusos@student-portal:~$ </span><span class="terminal-command" id="current-command"></span>`;
+                                    terminal.appendChild(newPrompt);
+                                    const oldCurrentCommand = currentCommand;
+                                    currentCommand = document.getElementById('current-command');
+                                    terminal.removeChild(oldCurrentCommand.parentNode);
+                                    terminal.scrollTop = terminal.scrollHeight;
+                                }
+                                commandIndex++;
+                                setTimeout(typeCommand, 2000);
+                            }, 500);
+                        }
+                    }, 100);
+                } else {
+                    commandIndex = 0;
+                    setTimeout(typeCommand, 5000);
+                }
+            }
+            setTimeout(typeCommand, 1000);
+        });
+    </script>
+</body>
+</html>
