@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Tutorials - NexusOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00f5ff;
+            --primary-dark: #00a8cc;
+            --secondary: #9d4edd;
+            --accent: #ff006e;
+            --dark: #0c0f1d;
+            --light: #e2eafc;
+            --panel-bg: rgba(20, 25, 50, 0.7);
+            --panel-border: rgba(0, 245, 255, 0.3);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0f1d 0%, #1a1f3a 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            background: rgba(30, 35, 70, 0.5);
+            border: 1px solid var(--panel-border);
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            border-color: var(--primary);
+        }
+
+        .app-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .help-container {
+            display: flex;
+            gap: 30px;
+        }
+
+        .help-sidebar {
+            width: 300px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .help-content {
+            flex: 1;
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            padding: 30px;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--panel-border);
+            color: var(--light);
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .nav-category {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .nav-item {
+            padding: 10px 15px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 245, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 245, 255, 0.2);
+            border-left: 3px solid var(--primary);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .app-guide {
+            margin-bottom: 40px;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 245, 255, 0.1);
+            border-radius: var(--radius);
+        }
+
+        .app-icon {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .app-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .feature-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .feature-item {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            border-left: 3px solid var(--primary);
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .quick-tips {
+            background: rgba(157, 78, 221, 0.1);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .tips-title {
+            color: var(--secondary);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .tip-item {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .tip-item:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+
+        .code-block {
+            background: rgba(10, 15, 30, 0.8);
+            border-radius: var(--radius);
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            border: 1px solid var(--panel-border);
+            overflow-x: auto;
+        }
+
+        .keyboard-shortcuts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+        }
+
+        .shortcut-key {
+            background: var(--primary);
+            color: var(--dark);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .section-content {
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        .contact-support {
+            background: rgba(255, 0, 110, 0.1);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 40px;
+            text-align: center;
+            border: 1px solid var(--accent);
+        }
+
+        .support-title {
+            color: var(--accent);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .support-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            margin: 5px;
+        }
+
+        .support-btn:hover {
+            background: #e0005e;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Desktop
+            </a>
+            <h1 class="app-title">
+                <i class="fas fa-question-circle"></i>
+                Help & Tutorials
+            </h1>
+        </div>
+
+        <div class="help-container">
+            <div class="help-sidebar">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search help topics...">
+                </div>
+
+                <div class="nav-category">
+                    <h3 class="category-title">Getting Started</h3>
+                    <div class="nav-item active" data-section="welcome">Welcome to NexusOS</div>
+                    <div class="nav-item" data-section="quickstart">Quick Start Guide</div>
+                    <div class="nav-item" data-section="keyboard">Keyboard Shortcuts</div>
+                </div>
+
+                <div class="nav-category">
+                    <h3 class="category-title">Applications</h3>
+                    <div class="nav-item" data-section="file-explorer">File Explorer</div>
+                    <div class="nav-item" data-section="terminal">Terminal</div>
+                    <div class="nav-item" data-section="browser">Web Browser</div>
+                    <div class="nav-item" data-section="text-editor">Text Editor</div>
+                    <div class="nav-item" data-section="media-player">Media Player</div>
+                    <div class="nav-item" data-section="calculator">Calculator</div>
+                </div>
+
+                <div class="nav-category">
+                    <h3 class="category-title">Advanced</h3>
+                    <div class="nav-item" data-section="programming">Programming Tips</div>
+                    <div class="nav-item" data-section="troubleshooting">Troubleshooting</div>
+                </div>
+            </div>
+
+            <div class="help-content">
+                <!-- Welcome Section -->
+                <div class="section-content active" id="welcome-section">
+                    <h2 class="section-title">Welcome to NexusOS Student Portal</h2>
+                    <p>NexusOS is a comprehensive student portal designed specifically for computer science students. It provides a simulated operating system environment where you can practice coding, manage files, browse the web, and much more - all within your browser.</p>
+                    
+                    <div class="quick-tips">
+                        <h3 class="tips-title">🚀 Quick Start</h3>
+                        <div class="tip-item">Double-click any app icon on the desktop to launch it</div>
+                        <div class="tip-item">Use the File Explorer to organize your projects</div>
+                        <div class="tip-item">The Text Editor automatically saves your work</div>
+                        <div class="tip-item">Try the Terminal for command-line practice</div>
+                    </div>
+
+                    <div class="app-guide">
+                        <h3>What's Included</h3>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="feature-title">🎯 Purpose-Built Tools</div>
+                                <p>All applications are designed with computer science students in mind, providing relevant features for programming and learning.</p>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-title">💾 Local Storage</div>
+                                <p>Your work is saved in your browser's local storage, so you can pick up right where you left off.</p>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-title">🔒 Privacy Focused</div>
+                                <p>All applications run locally in your browser - no data is sent to external servers.</p>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-title">📚 Learning Resources</div>
+                                <p>Integrated help system with tutorials and examples to help you learn.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Explorer Section -->
+                <div class="section-content" id="file-explorer-section">
+                    <div class="app-header">
+                        <div class="app-icon"><i class="fas fa-folder"></i></div>
+                        <div class="app-name">File Explorer</div>
+                    </div>
+
+                    <p>The File Explorer helps you organize and manage your projects and files within NexusOS.</p>
+
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <div class="feature-title">📁 File Management</div>
+                            <p>Create folders, organize your projects, and keep your work structured. The File Explorer provides a familiar tree-based navigation system.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-title">🔍 Quick Access</div>
+                            <p>Use the sidebar for quick navigation to common locations like Documents, Downloads, and your Desktop.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-title">📄 File Operations</div>
+                            <p>Double-click files to open them in their default applications. Supported file types include text files, code files, and more.</p>
+                        </div>
+                    </div>
+
+                    <div class="quick-tips">
+                        <h3 class="tips-title">File Explorer Tips</h3>
+                        <div class="tip-item">Organize your computer science projects in dedicated folders</div>
+                        <div class="tip-item">Use meaningful names for your files and folders</div>
+                        <div class="tip-item">Keep backup copies of important projects</div>
+                    </div>
+                </div>
+
+                <!-- Terminal Section -->
+                <div class="section-content" id="terminal-section">
+                    <div class="app-header">
+                        <div class="app-icon"><i class="fas fa-terminal"></i></div>
+                        <div class="app-name">Terminal</div>
+                    </div>
+
+                    <p>Practice command-line operations and test code snippets in a safe, simulated environment.</p>
+
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <div class="feature-title">💻 Command Practice</div>
+                            <p>Learn essential command-line operations with our simulated terminal. Perfect for practicing before working with real systems.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-title">⚡ JavaScript Execution</div>
+                            <p>Test and run JavaScript code directly in the terminal. Great for quick prototyping and learning.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-title">📚 Learning Commands</div>
+                            <p>Start with basic commands and gradually learn more advanced operations as you progress.</p>
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+// Example: Try these commands in the terminal<br>
+help&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Show available commands<br>
+date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Display current date and time<br>
+echo "Hello"&nbsp;// Print text to console<br>
+ls&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// List files<br>
+clear&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Clear the terminal
+                    </div>
+
+                    <div class="quick-tips">
+                        <h3 class="tips-title">Terminal Tips</h3>
+                        <div class="tip-item">Use 'help' to see all available commands</div>
+                        <div class="tip-item">Practice common Linux/Mac terminal commands</div>
+                        <div class="tip-item">The terminal supports basic file operations</div>
+                    </div>
+                </div>
+
+                <!-- Text Editor Section -->
+                <div class="section-content" id="text-editor-section">
+                    <div class="app-header">
+                        <div class="app-icon"><i class="fas fa-edit"></i></div>
+                        <div class="app-name">Text Editor</div>
+                    </div>
+
+                    <p>A powerful text editor designed for coding and note-taking, with features tailored for programming students.</p>
+
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <div class="feature-title">📝 Code Editing</div>
+                            <p>Write and edit code with support for multiple programming languages. The editor provides a clean, distraction-free environment.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-title">💾 Auto-Save</div>
+                            <p>Your work is automatically saved as you type, so you never lose your progress.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-title">📤 Export Options</div>
+                            <p>Export your files to download them to your computer or share with others.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-title">🎨 Syntax Support</div>
+                            <p>Switch between different programming language modes for better editing experience.</p>
+                        </div>
+                    </div>
+
+                    <div class="keyboard-shortcuts">
+                        <div class="shortcut-item">
+                            <span>Save File</span>
+                            <span class="shortcut-key">Ctrl+S</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span>New File</span>
+                            <span class="shortcut-key">Ctrl+N</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span>Select All</span>
+                            <span class="shortcut-key">Ctrl+A</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span>Find</span>
+                            <span class="shortcut-key">Ctrl+F</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add more sections for other apps -->
+
+                <div class="contact-support">
+                    <h3 class="support-title">Need More Help?</h3>
+                    <p>If you can't find what you're looking for or need additional assistance:</p>
+                    <button class="support-btn">
+                        <i class="fas fa-book"></i> View Documentation
+                    </button>
+                    <button class="support-btn">
+                        <i class="fas fa-comments"></i> Community Forum
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const sectionContents = document.querySelectorAll('.section-content');
+            const searchInput = document.querySelector('.search-input');
+
+            // Navigation
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show selected section
+                    sectionContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${section}-section`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                if (searchTerm.length > 2) {
+                    // Simple search implementation
+                    navItems.forEach(item => {
+                        const text = item.textContent.toLowerCase();
+                        if (text.includes(searchTerm)) {
+                            item.style.display = 'flex';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                } else {
+                    navItems.forEach(item => {
+                        item.style.display = 'flex';
+                    });
+                }
+            });
+
+            // Support buttons
+            document.querySelectorAll('.support-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    alert('This would open external documentation or forums in a real implementation.');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

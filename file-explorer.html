@@ -1,3 +1,4 @@
+<!-- file-explorer.html - Updated -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Explorer - NexusOS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="nexusos-settings.js"></script>
+    <script src="nexusos-filesystem.js"></script>
     <style>
         :root {
             --primary: #00f5ff;
@@ -17,6 +20,7 @@
             --panel-border: rgba(0, 245, 255, 0.3);
             --radius: 12px;
             --transition: all 0.3s ease;
+            --font-size: 16px;
         }
 
         * {
@@ -24,8 +28,10 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', sans-serif;
+            font-size: var(--font-size);
         }
 
+        /* Rest of your existing file explorer CSS */
         body {
             background: linear-gradient(135deg, #0c0f1d 0%, #1a1f3a 100%);
             color: var(--light);
@@ -52,6 +58,16 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            background: rgba(30, 35, 70, 0.5);
+            border: 1px solid var(--panel-border);
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            border-color: var(--primary);
         }
 
         .app-title {
@@ -115,6 +131,48 @@
         .path {
             font-size: 1.1rem;
             color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .breadcrumb-item {
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .breadcrumb-item:hover {
+            color: var(--primary);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(30, 35, 70, 0.7);
+            color: var(--light);
+            border: 1px solid var(--panel-border);
+        }
+
+        .btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            border-color: var(--primary);
         }
 
         .file-grid {
@@ -150,6 +208,7 @@
         .file-name {
             font-size: 0.9rem;
             margin-bottom: 5px;
+            word-break: break-word;
         }
 
         .file-size {
@@ -157,29 +216,24 @@
             color: #8d99ae;
         }
 
-        .toolbar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+        .context-menu {
+            position: absolute;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            padding: 10px 0;
+            display: none;
+            z-index: 1000;
         }
 
-        .btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: var(--radius);
+        .context-menu-item {
+            padding: 8px 20px;
             cursor: pointer;
             transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(30, 35, 70, 0.7);
-            color: var(--light);
-            border: 1px solid var(--panel-border);
         }
 
-        .btn:hover {
-            background: rgba(0, 245, 255, 0.2);
-            border-color: var(--primary);
+        .context-menu-item:hover {
+            background: rgba(0, 245, 255, 0.1);
         }
     </style>
 </head>
@@ -199,27 +253,23 @@
         <div class="file-explorer">
             <div class="sidebar">
                 <h3 class="sidebar-title">Quick Access</h3>
-                <div class="nav-item active">
+                <div class="nav-item active" data-path="/">
                     <i class="fas fa-home"></i>
                     Home
                 </div>
-                <div class="nav-item">
-                    <i class="fas fa-desktop"></i>
-                    Desktop
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-download"></i>
-                    Downloads
-                </div>
-                <div class="nav-item">
+                <div class="nav-item" data-path="/Documents">
                     <i class="fas fa-file"></i>
                     Documents
                 </div>
-                <div class="nav-item">
-                    <i class="fas fa-image"></i>
-                    Pictures
+                <div class="nav-item" data-path="/Downloads">
+                    <i class="fas fa-download"></i>
+                    Downloads
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" data-path="/Projects">
+                    <i class="fas fa-folder"></i>
+                    Projects
+                </div>
+                <div class="nav-item" data-path="/Music">
                     <i class="fas fa-music"></i>
                     Music
                 </div>
@@ -228,80 +278,279 @@
             <div class="content">
                 <div class="content-header">
                     <div class="path">
-                        <i class="fas fa-home"></i> / Home
+                        <div class="breadcrumb" id="breadcrumb">
+                            <!-- Breadcrumb will be populated by JavaScript -->
+                        </div>
                     </div>
                     <div class="toolbar">
-                        <button class="btn">
-                            <i class="fas fa-plus"></i> New Folder
+                        <button class="btn" id="new-folder-btn">
+                            <i class="fas fa-folder-plus"></i> New Folder
                         </button>
-                        <button class="btn">
+                        <button class="btn" id="upload-file-btn">
                             <i class="fas fa-upload"></i> Upload File
                         </button>
+                        <input type="file" id="file-upload" style="display: none;" multiple>
                     </div>
                 </div>
 
-                <div class="file-grid">
-                    <div class="file-item">
-                        <div class="file-icon"><i class="fas fa-folder"></i></div>
-                        <div class="file-name">Projects</div>
-                        <div class="file-size">--</div>
-                    </div>
-                    <div class="file-item">
-                        <div class="file-icon"><i class="fas fa-folder"></i></div>
-                        <div class="file-name">School Work</div>
-                        <div class="file-size">--</div>
-                    </div>
-                    <div class="file-item">
-                        <div class="file-icon"><i class="fas fa-file-alt"></i></div>
-                        <div class="file-name">notes.txt</div>
-                        <div class="file-size">4 KB</div>
-                    </div>
-                    <div class="file-item">
-                        <div class="file-icon"><i class="fas fa-file-code"></i></div>
-                        <div class="file-name">project.js</div>
-                        <div class="file-size">15 KB</div>
-                    </div>
-                    <div class="file-item">
-                        <div class="file-icon"><i class="fas fa-file-pdf"></i></div>
-                        <div class="file-name">report.pdf</div>
-                        <div class="file-size">2.4 MB</div>
-                    </div>
-                    <div class="file-item">
-                        <div class="file-icon"><i class="fas fa-file-image"></i></div>
-                        <div class="file-name">screenshot.png</div>
-                        <div class="file-size">1.1 MB</div>
-                    </div>
+                <div class="file-grid" id="file-grid">
+                    <!-- Files will be populated by JavaScript -->
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="context-menu" id="context-menu">
+        <div class="context-menu-item" data-action="open">Open</div>
+        <div class="context-menu-item" data-action="rename">Rename</div>
+        <div class="context-menu-item" data-action="delete">Delete</div>
+    </div>
+
     <script>
-        // File explorer functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const fileItems = document.querySelectorAll('.file-item');
+            const fileSystem = window.nexusFS;
+            const fileGrid = document.getElementById('file-grid');
+            const breadcrumb = document.getElementById('breadcrumb');
             const navItems = document.querySelectorAll('.nav-item');
-            
-            // File item click handler
-            fileItems.forEach(item => {
-                item.addEventListener('dblclick', function() {
-                    const fileName = this.querySelector('.file-name').textContent;
-                    alert(`Opening ${fileName}...`);
-                    // In a real implementation, this would open the file in the appropriate app
+            const contextMenu = document.getElementById('context-menu');
+            const newFolderBtn = document.getElementById('new-folder-btn');
+            const uploadFileBtn = document.getElementById('upload-file-btn');
+            const fileUpload = document.getElementById('file-upload');
+
+            let currentPath = '/';
+            let selectedFile = null;
+
+            function updateFileDisplay() {
+                const files = fileSystem.listFiles(currentPath);
+                fileGrid.innerHTML = '';
+
+                files.forEach(file => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.setAttribute('data-path', file.path);
+                    
+                    const icon = file.type === 'directory' ? 'fa-folder' : getFileIcon(file.name);
+                    const size = file.type === 'directory' ? '--' : formatFileSize(file.size);
+                    
+                    fileItem.innerHTML = `
+                        <div class="file-icon"><i class="fas ${icon}"></i></div>
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${size}</div>
+                    `;
+                    
+                    fileItem.addEventListener('click', (e) => {
+                        if (e.detail === 2) { // Double click
+                            openFile(file.path);
+                        } else {
+                            selectedFile = file.path;
+                        }
+                    });
+
+                    fileItem.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        selectedFile = file.path;
+                        showContextMenu(e.clientX, e.clientY);
+                    });
+
+                    fileGrid.appendChild(fileItem);
                 });
-            });
-            
-            // Navigation click handler
+
+                updateBreadcrumb();
+            }
+
+            function getFileIcon(filename) {
+                const ext = filename.split('.').pop().toLowerCase();
+                const iconMap = {
+                    'txt': 'fa-file-alt',
+                    'js': 'fa-file-code',
+                    'html': 'fa-code',
+                    'css': 'fa-css3',
+                    'json': 'fa-file-code',
+                    'md': 'fa-markdown',
+                    'mp3': 'fa-music',
+                    'mp4': 'fa-video',
+                    'wav': 'fa-music',
+                    'ogg': 'fa-music',
+                    'jpg': 'fa-image',
+                    'png': 'fa-image',
+                    'gif': 'fa-image'
+                };
+                return iconMap[ext] || 'fa-file';
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 B';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+            }
+
+            function updateBreadcrumb() {
+                breadcrumb.innerHTML = '';
+                const parts = currentPath.split('/').filter(p => p);
+                
+                // Add home icon
+                const homeItem = document.createElement('div');
+                homeItem.className = 'breadcrumb-item';
+                homeItem.innerHTML = '<i class="fas fa-home"></i>';
+                homeItem.addEventListener('click', () => navigateTo('/'));
+                breadcrumb.appendChild(homeItem);
+
+                // Add path parts
+                let current = '';
+                parts.forEach(part => {
+                    current += '/' + part;
+                    const item = document.createElement('div');
+                    item.className = 'breadcrumb-item';
+                    item.textContent = part;
+                    item.addEventListener('click', () => navigateTo(current));
+                    breadcrumb.appendChild(item);
+                    
+                    // Add separator
+                    if (part !== parts[parts.length - 1]) {
+                        const sep = document.createElement('div');
+                        sep.textContent = '/';
+                        sep.style.margin = '0 5px';
+                        breadcrumb.appendChild(sep);
+                    }
+                });
+            }
+
+            function navigateTo(path) {
+                currentPath = path;
+                updateFileDisplay();
+                
+                // Update active nav item
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('data-path') === path) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            function openFile(path) {
+                const file = fileSystem.files[path];
+                if (!file) return;
+
+                if (file.type === 'directory') {
+                    navigateTo(path);
+                } else {
+                    // Open file in appropriate app
+                    const fileType = fileSystem.getFileType(path);
+                    const content = fileSystem.readFile(path);
+                    
+                    switch(fileType) {
+                        case 'text':
+                        case 'javascript':
+                        case 'html':
+                        case 'css':
+                        case 'markdown':
+                            // Open in text editor
+                            localStorage.setItem('nexusos-text-editor-file', path);
+                            localStorage.setItem('nexusos-text-editor-content', content);
+                            window.open('text-editor.html', '_blank');
+                            break;
+                        case 'audio':
+                        case 'video':
+                            // Open in media player
+                            // This would need more complex handling for binary data
+                            alert('Audio/Video files can be played in the Media Player app');
+                            break;
+                        default:
+                            // Download file
+                            downloadFile(path, content);
+                    }
+                }
+            }
+
+            function downloadFile(path, content) {
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = path.split('/').pop();
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            function showContextMenu(x, y) {
+                contextMenu.style.display = 'block';
+                contextMenu.style.left = x + 'px';
+                contextMenu.style.top = y + 'px';
+            }
+
+            function hideContextMenu() {
+                contextMenu.style.display = 'none';
+            }
+
+            // Event listeners
             navItems.forEach(item => {
                 item.addEventListener('click', function() {
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const location = this.textContent.trim();
-                    document.querySelector('.path').innerHTML = 
-                        `<i class="fas fa-home"></i> / ${location}`;
+                    const path = this.getAttribute('data-path');
+                    navigateTo(path);
                 });
             });
+
+            newFolderBtn.addEventListener('click', function() {
+                const name = prompt('Enter folder name:');
+                if (name) {
+                    const path = currentPath + (currentPath === '/' ? '' : '/') + name;
+                    fileSystem.createDirectory(path);
+                    updateFileDisplay();
+                }
+            });
+
+            uploadFileBtn.addEventListener('click', function() {
+                fileUpload.click();
+            });
+
+            fileUpload.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const path = currentPath + (currentPath === '/' ? '' : '/') + file.name;
+                        fileSystem.createFile(path, e.target.result);
+                        updateFileDisplay();
+                    };
+                    reader.readAsText(file);
+                });
+            });
+
+            document.addEventListener('click', hideContextMenu);
+            contextMenu.addEventListener('click', function(e) {
+                const action = e.target.getAttribute('data-action');
+                if (selectedFile && action) {
+                    handleContextAction(action, selectedFile);
+                }
+                hideContextMenu();
+            });
+
+            function handleContextAction(action, filePath) {
+                switch(action) {
+                    case 'open':
+                        openFile(filePath);
+                        break;
+                    case 'rename':
+                        const newName = prompt('Enter new name:', filePath.split('/').pop());
+                        if (newName) {
+                            // Rename logic would go here
+                            alert('Rename functionality to be implemented');
+                        }
+                        break;
+                    case 'delete':
+                        if (confirm('Are you sure you want to delete this file?')) {
+                            fileSystem.deleteFile(filePath);
+                            updateFileDisplay();
+                        }
+                        break;
+                }
+            }
+
+            // Initialize
+            updateFileDisplay();
         });
     </script>
 </body>
