@@ -369,6 +369,99 @@
             // Initialize with Google
             urlInput.value = 'https://www.google.com';
         });
+
+        // nexusos-settings.js - Include this in all HTML files
+class NexusSettings {
+    constructor() {
+        this.settings = this.loadSettings();
+        this.applySettings();
+    }
+
+    loadSettings() {
+        const defaultSettings = {
+            theme: 'dark',
+            colorScheme: 'blue',
+            fontSize: 'medium',
+            animations: true,
+            autosave: true,
+            backupInterval: 15
+        };
+
+        const saved = localStorage.getItem('nexusos-settings');
+        return saved ? {...defaultSettings, ...JSON.parse(saved)} : defaultSettings;
+    }
+
+    saveSettings() {
+        localStorage.setItem('nexusos-settings', JSON.stringify(this.settings));
+        this.applySettings();
+    }
+
+    applySettings() {
+        // Apply theme
+        document.body.classList.remove('light-mode', 'dark-mode');
+        document.body.classList.add(this.settings.theme + '-mode');
+
+        // Apply color scheme CSS variables
+        this.applyColorScheme(this.settings.colorScheme);
+        
+        // Apply font size
+        document.documentElement.style.setProperty('--font-size', this.getFontSize());
+        
+        // Apply animations
+        document.body.style.setProperty('--transition', this.settings.animations ? 'all 0.3s ease' : 'none');
+    }
+
+    applyColorScheme(scheme) {
+        const schemes = {
+            blue: {
+                '--primary': '#00f5ff',
+                '--primary-dark': '#00a8cc',
+                '--secondary': '#9d4edd'
+            },
+            purple: {
+                '--primary': '#9d4edd',
+                '--primary-dark': '#7b2cbf',
+                '--secondary': '#00f5ff'
+            },
+            green: {
+                '--primary': '#38b000',
+                '--primary-dark': '#2a9400',
+                '--secondary': '#9d4edd'
+            },
+            red: {
+                '--primary': '#ef233c',
+                '--primary-dark': '#cc001f',
+                '--secondary': '#9d4edd'
+            }
+        };
+
+        const colors = schemes[scheme] || schemes.blue;
+        Object.entries(colors).forEach(([key, value]) => {
+            document.documentElement.style.setProperty(key, value);
+        });
+    }
+
+    getFontSize() {
+        const sizes = {
+            small: '14px',
+            medium: '16px',
+            large: '18px'
+        };
+        return sizes[this.settings.fontSize] || sizes.medium;
+    }
+
+    updateSetting(key, value) {
+        this.settings[key] = value;
+        this.saveSettings();
+    }
+
+    getSetting(key) {
+        return this.settings[key];
+    }
+}
+
+// Global instance
+window.nexusSettings = new NexusSettings();
     </script>
 </body>
 </html>
