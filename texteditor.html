@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Editor - NexusOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00f5ff;
+            --primary-dark: #00a8cc;
+            --secondary: #9d4edd;
+            --accent: #ff006e;
+            --dark: #0c0f1d;
+            --light: #e2eafc;
+            --panel-bg: rgba(20, 25, 50, 0.7);
+            --panel-border: rgba(0, 245, 255, 0.3);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0f1d 0%, #1a1f3a 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            background: rgba(30, 35, 70, 0.5);
+            border: 1px solid var(--panel-border);
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            border-color: var(--primary);
+        }
+
+        .app-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .editor-container {
+            flex: 1;
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--panel-border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(30, 35, 70, 0.8);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: rgba(0, 245, 255, 0.2);
+            border: 1px solid var(--primary);
+        }
+
+        .format-buttons {
+            display: flex;
+            gap: 5px;
+            margin-left: auto;
+        }
+
+        .format-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            transition: var(--transition);
+        }
+
+        .format-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+        }
+
+        .format-btn.active {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        .editor-area {
+            flex: 1;
+            padding: 0;
+            position: relative;
+        }
+
+        .editor {
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 30, 0.9);
+            border: none;
+            color: var(--light);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            line-height: 1.5;
+            padding: 20px;
+            resize: none;
+            outline: none;
+        }
+
+        .editor:focus {
+            background: rgba(15, 20, 40, 0.95);
+        }
+
+        .status-bar {
+            padding: 8px 20px;
+            border-top: 1px solid var(--panel-border);
+            background: rgba(30, 35, 70, 0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .line-info {
+            display: flex;
+            gap: 15px;
+        }
+
+        .syntax-select {
+            padding: 5px 10px;
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--panel-border);
+            color: var(--light);
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Desktop
+            </a>
+            <h1 class="app-title">
+                <i class="fas fa-edit"></i>
+                Text Editor
+            </h1>
+        </div>
+
+        <div class="editor-container">
+            <div class="toolbar">
+                <button class="btn" id="new-btn">
+                    <i class="fas fa-file"></i> New
+                </button>
+                <button class="btn" id="open-btn">
+                    <i class="fas fa-folder-open"></i> Open
+                </button>
+                <button class="btn btn-primary" id="save-btn">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button class="btn" id="export-btn">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                
+                <div class="format-buttons">
+                    <button class="format-btn" data-format="bold" title="Bold">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button class="format-btn" data-format="italic" title="Italic">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button class="format-btn" data-format="underline" title="Underline">
+                        <i class="fas fa-underline"></i>
+                    </button>
+                </div>
+
+                <select class="syntax-select" id="syntax-select">
+                    <option value="plaintext">Plain Text</option>
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                </select>
+            </div>
+
+            <div class="editor-area">
+                <textarea class="editor" id="editor" placeholder="Start typing your code or notes here..."></textarea>
+            </div>
+
+            <div class="status-bar">
+                <div class="file-info">
+                    <span class="file-name" id="current-file">untitled.txt</span>
+                    <span id="file-status">- Modified</span>
+                </div>
+                <div class="line-info">
+                    <span>Line: <span id="line-number">1</span></span>
+                    <span>Column: <span id="column-number">1</span></span>
+                    <span>Words: <span id="word-count">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('editor');
+            const newBtn = document.getElementById('new-btn');
+            const openBtn = document.getElementById('open-btn');
+            const saveBtn = document.getElementById('save-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const syntaxSelect = document.getElementById('syntax-select');
+            const formatBtns = document.querySelectorAll('.format-btn');
+            const currentFile = document.getElementById('current-file');
+            const fileStatus = document.getElementById('file-status');
+            const lineNumber = document.getElementById('line-number');
+            const columnNumber = document.getElementById('column-number');
+            const wordCount = document.getElementById('word-count');
+
+            let currentFileName = 'untitled.txt';
+            let isModified = false;
+
+            // Load saved content from localStorage
+            const savedContent = localStorage.getItem('nexusos-text-editor');
+            if (savedContent) {
+                editor.value = savedContent;
+                updateStatus();
+            }
+
+            function updateStatus() {
+                const text = editor.value;
+                const lines = text.split('\n');
+                const currentLine = text.substr(0, editor.selectionStart).split('\n').length;
+                const currentColumn = editor.selectionStart - text.lastIndexOf('\n', editor.selectionStart - 1);
+                const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+
+                lineNumber.textContent = currentLine;
+                columnNumber.textContent = currentColumn;
+                wordCount.textContent = words;
+
+                fileStatus.textContent = isModified ? '● Modified' : '- Saved';
+            }
+
+            function saveFile() {
+                const content = editor.value;
+                localStorage.setItem('nexusos-text-editor', content);
+                isModified = false;
+                updateStatus();
+                showNotification('Document saved successfully!');
+            }
+
+            function exportFile() {
+                const content = editor.value;
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = currentFileName;
+                a.click();
+                URL.revokeObjectURL(url);
+                showNotification('File exported successfully!');
+            }
+
+            function showNotification(message) {
+                // Create a simple notification
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--primary);
+                    color: var(--dark);
+                    padding: 10px 20px;
+                    border-radius: var(--radius);
+                    font-weight: 600;
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease;
+                `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            // Event listeners
+            newBtn.addEventListener('click', () => {
+                if (isModified && !confirm('You have unsaved changes. Create new file anyway?')) {
+                    return;
+                }
+                editor.value = '';
+                currentFileName = 'untitled.txt';
+                currentFile.textContent = currentFileName;
+                isModified = false;
+                updateStatus();
+            });
+
+            openBtn.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.txt,.js,.html,.css,.py,.java,.cpp';
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            editor.value = e.target.result;
+                            currentFileName = file.name;
+                            currentFile.textContent = currentFileName;
+                            isModified = false;
+                            updateStatus();
+                        };
+                        reader.readAsText(file);
+                    }
+                };
+                input.click();
+            });
+
+            saveBtn.addEventListener('click', saveFile);
+            exportBtn.addEventListener('click', exportFile);
+
+            editor.addEventListener('input', () => {
+                isModified = true;
+                updateStatus();
+            });
+
+            editor.addEventListener('keyup', updateStatus);
+            editor.addEventListener('click', updateStatus);
+
+            syntaxSelect.addEventListener('change', () => {
+                const syntax = syntaxSelect.value;
+                // In a real implementation, this would change syntax highlighting
+                showNotification(`Syntax highlighting set to: ${syntax}`);
+            });
+
+            formatBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const format = btn.getAttribute('data-format');
+                    const start = editor.selectionStart;
+                    const end = editor.selectionEnd;
+                    const selectedText = editor.value.substring(start, end);
+                    
+                    let formattedText = selectedText;
+                    switch(format) {
+                        case 'bold':
+                            formattedText = `**${selectedText}**`;
+                            break;
+                        case 'italic':
+                            formattedText = `*${selectedText}*`;
+                            break;
+                        case 'underline':
+                            formattedText = `__${selectedText}__`;
+                            break;
+                    }
+                    
+                    editor.setRangeText(formattedText, start, end, 'select');
+                    editor.focus();
+                });
+            });
+
+            // Auto-save every 30 seconds
+            setInterval(() => {
+                if (isModified) {
+                    saveFile();
+                }
+            }, 30000);
+
+            // Initial status update
+            updateStatus();
+        });
+    </script>
+</body>
+</html>

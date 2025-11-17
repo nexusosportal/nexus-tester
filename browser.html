@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Browser - NexusOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00f5ff;
+            --primary-dark: #00a8cc;
+            --secondary: #9d4edd;
+            --accent: #ff006e;
+            --dark: #0c0f1d;
+            --light: #e2eafc;
+            --panel-bg: rgba(20, 25, 50, 0.7);
+            --panel-border: rgba(0, 245, 255, 0.3);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0f1d 0%, #1a1f3a 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            background: rgba(30, 35, 70, 0.5);
+            border: 1px solid var(--panel-border);
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            border-color: var(--primary);
+        }
+
+        .app-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .browser-container {
+            flex: 1;
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .browser-nav {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--panel-border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(30, 35, 70, 0.8);
+        }
+
+        .nav-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+        }
+
+        .url-bar {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--panel-border);
+            color: var(--light);
+            font-size: 1rem;
+        }
+
+        .go-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            background: var(--primary);
+            color: var(--dark);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .go-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .browser-content {
+            flex: 1;
+            border: none;
+            background: white;
+        }
+
+        .quick-links {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            background: rgba(30, 35, 70, 0.3);
+        }
+
+        .quick-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--panel-border);
+            transition: var(--transition);
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--light);
+        }
+
+        .quick-link:hover {
+            background: rgba(0, 245, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .link-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .link-name {
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .browser-frame {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        .browser-frame.active {
+            display: block;
+        }
+
+        .home-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .home-screen.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Desktop
+            </a>
+            <h1 class="app-title">
+                <i class="fas fa-globe"></i>
+                Web Browser
+            </h1>
+        </div>
+
+        <div class="browser-container">
+            <div class="browser-nav">
+                <button class="nav-btn" id="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button class="nav-btn" id="forward-btn">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <button class="nav-btn" id="refresh-btn">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="nav-btn" id="home-btn">
+                    <i class="fas fa-home"></i>
+                </button>
+                <input type="text" class="url-bar" id="url-input" placeholder="Enter URL or search term..." value="https://www.google.com">
+                <button class="go-btn" id="go-btn">
+                    <i class="fas fa-search"></i> Go
+                </button>
+            </div>
+
+            <div class="home-screen active" id="home-screen">
+                <div class="quick-links">
+                    <a href="#" class="quick-link" data-url="https://www.google.com">
+                        <div class="link-icon"><i class="fab fa-google"></i></div>
+                        <div class="link-name">Google</div>
+                    </a>
+                    <a href="#" class="quick-link" data-url="https://github.com">
+                        <div class="link-icon"><i class="fab fa-github"></i></div>
+                        <div class="link-name">GitHub</div>
+                    </a>
+                    <a href="#" class="quick-link" data-url="https://stackoverflow.com">
+                        <div class="link-icon"><i class="fab fa-stack-overflow"></i></div>
+                        <div class="link-name">Stack Overflow</div>
+                    </a>
+                    <a href="#" class="quick-link" data-url="https://www.wikipedia.org">
+                        <div class="link-icon"><i class="fab fa-wikipedia-w"></i></div>
+                        <div class="link-name">Wikipedia</div>
+                    </a>
+                    <a href="#" class="quick-link" data-url="https://www.youtube.com">
+                        <div class="link-icon"><i class="fab fa-youtube"></i></div>
+                        <div class="link-name">YouTube</div>
+                    </a>
+                    <a href="#" class="quick-link" data-url="https://chat.openai.com">
+                        <div class="link-icon"><i class="fas fa-robot"></i></div>
+                        <div class="link-name">ChatGPT</div>
+                    </a>
+                </div>
+            </div>
+
+            <iframe class="browser-frame" id="browser-frame" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlInput = document.getElementById('url-input');
+            const goBtn = document.getElementById('go-btn');
+            const backBtn = document.getElementById('back-btn');
+            const forwardBtn = document.getElementById('forward-btn');
+            const refreshBtn = document.getElementById('refresh-btn');
+            const homeBtn = document.getElementById('home-btn');
+            const browserFrame = document.getElementById('browser-frame');
+            const homeScreen = document.getElementById('home-screen');
+            const quickLinks = document.querySelectorAll('.quick-link');
+
+            let history = [];
+            let currentHistoryIndex = -1;
+
+            function navigateToUrl(url) {
+                if (!url) return;
+                
+                // Add http:// if no protocol specified
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'https://' + url;
+                }
+                
+                browserFrame.src = url;
+                browserFrame.classList.add('active');
+                homeScreen.classList.remove('active');
+                
+                // Add to history
+                history.push(url);
+                currentHistoryIndex = history.length - 1;
+                
+                updateNavButtons();
+            }
+
+            function updateNavButtons() {
+                backBtn.disabled = currentHistoryIndex <= 0;
+                forwardBtn.disabled = currentHistoryIndex >= history.length - 1;
+            }
+
+            function goBack() {
+                if (currentHistoryIndex > 0) {
+                    currentHistoryIndex--;
+                    browserFrame.src = history[currentHistoryIndex];
+                    updateNavButtons();
+                }
+            }
+
+            function goForward() {
+                if (currentHistoryIndex < history.length - 1) {
+                    currentHistoryIndex++;
+                    browserFrame.src = history[currentHistoryIndex];
+                    updateNavButtons();
+                }
+            }
+
+            function goHome() {
+                browserFrame.classList.remove('active');
+                homeScreen.classList.add('active');
+                urlInput.value = 'https://www.google.com';
+            }
+
+            // Event listeners
+            goBtn.addEventListener('click', () => {
+                navigateToUrl(urlInput.value);
+            });
+
+            urlInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    navigateToUrl(urlInput.value);
+                }
+            });
+
+            backBtn.addEventListener('click', goBack);
+            forwardBtn.addEventListener('click', goForward);
+            refreshBtn.addEventListener('click', () => {
+                if (browserFrame.src) {
+                    browserFrame.src = browserFrame.src;
+                }
+            });
+
+            homeBtn.addEventListener('click', goHome);
+
+            // Quick links
+            quickLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const url = link.getAttribute('data-url');
+                    urlInput.value = url;
+                    navigateToUrl(url);
+                });
+            });
+
+            // Update URL when frame navigates
+            browserFrame.addEventListener('load', () => {
+                if (browserFrame.src) {
+                    urlInput.value = browserFrame.src;
+                }
+            });
+
+            // Initialize with Google
+            urlInput.value = 'https://www.google.com';
+        });
+    </script>
+</body>
+</html>
